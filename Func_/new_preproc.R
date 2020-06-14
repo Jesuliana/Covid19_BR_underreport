@@ -1,7 +1,7 @@
 library(readxl)
 library(dplyr)
 library(reshape)
-source("COVID19/timeseries.R")
+source("timeseries.R")
 library(ggplot2)
 library(zoo)
 source("ETL_SRAG.R")

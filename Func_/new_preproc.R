@@ -1,10 +1,12 @@
 library(readxl)
 library(dplyr)
 library(reshape)
-source("timeseries.R")
+#source("timeseries.R")
+source('https://raw.githubusercontent.com/balthapaixao/Covid_19/master/Func_/timeseries.R?token=AD4N2UZHUJ2J57WTAHMLOZS64ZXUO')
 library(ggplot2)
 library(zoo)
-source("ETL_SRAG.R")
+#source("ETL_SRAG.R")
+source("https://raw.githubusercontent.com/balthapaixao/Covid_19/master/Func_/ETL_SRAG.R?token=AD4N2UYRLPZIXQXGKATHUV264ZXLA")
 
 compute_ma <- function(data) {
   data_ema <- data %>% select(ano, semana)

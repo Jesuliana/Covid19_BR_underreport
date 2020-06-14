@@ -1,5 +1,4 @@
 library(readxl)
-library(readr)
 library(dplyr)
 library(reshape)
 #source("timeseries.R")
@@ -77,9 +76,8 @@ pre_proc_data <- function(data = X, tipo = 'graficos'){
   return (serie_total)
 }
 pre_proc_merge <- function(data, tipo){
-  
   #ufs <- read_excel("~/Aux_arqs/ufs.xls")
-  ufs <- read_cvs2("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Aux_arqs/ufs.csv")
+  ufs <- read_csv2("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Aux_arqs/ufs.csv")
   ufs["X1"] <- NULL
   ufs$Sigla <- as.factor(ufs$Sigla)
   if(tipo == 'graficos'){

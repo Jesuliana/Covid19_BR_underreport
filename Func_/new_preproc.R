@@ -7,6 +7,7 @@ library(ggplot2)
 library(zoo)
 #source("ETL_SRAG.R")
 source("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Func_/ETL_SRAG.R")
+source('https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Func_/evtdet.R')
 
 compute_ma <- function(data) {
   data_ema <- data %>% select(ano, semana)

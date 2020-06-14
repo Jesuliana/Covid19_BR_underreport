@@ -77,7 +77,9 @@ pre_proc_data <- function(data = X, tipo = 'graficos'){
 }
 pre_proc_merge <- function(data, tipo){
   
-  ufs <- read_excel("~/Aux_arqs/ufs.xls")
+  #ufs <- read_excel("~/Aux_arqs/ufs.xls")
+  ufs <- read_cvs2("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Aux_arqs/ufs.csv")
+  ufs["X1"] <- NULL
   ufs$Sigla <- as.factor(ufs$Sigla)
   if(tipo == 'graficos'){
     XU <- merge(x=data, y=ufs, by.x="Unidade da Federação", by.y="Estado") %>% 
@@ -104,7 +106,9 @@ pre_proc_merge <- function(data, tipo){
 }
 pre_proc_ms <- function(){
   infogripe_data = '2020-05-02'
-  serie_ms <- read_excel('~/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.xlsx') #dado do ms
+  #serie_ms <- read_excel('~/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.xlsx') #dado do ms
+  serie_ms <- read_csv2("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.csv")
+  serie_ms["X1"] <- NULL
   serie_ms$casosAcumulado <- as.numeric(serie_ms$casosAcumulado)
   serie_ms$obitosAcumulado <- as.numeric(serie_ms$obitosAcumulado)
   

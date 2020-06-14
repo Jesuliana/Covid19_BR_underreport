@@ -60,7 +60,6 @@ pre_proc_data <- function(data = X, tipo = 'graficos'){
     #return (lista_serie_casos, lista_serie_obitos)
   }
   else{
-    
     lista_serie_casos <- pre_proc_merge(dt_casos, tipo)
     lista_serie_obitos <- pre_proc_merge(dt_obitos, tipo)
     #serie <- list(serie_sem_covid, serie_covid)

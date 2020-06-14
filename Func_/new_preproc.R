@@ -56,7 +56,8 @@ pre_proc_data <- function(data = X, tipo = 'graficos'){
     lista_serie_casos <- pre_proc_merge(dt_casos, tipo)
     lista_serie_obitos <- pre_proc_merge(dt_obitos, tipo)
     
-    serie_total = list("casos" = lista_serie_casos, "obitos" = lista_serie_obitos)
+    #serie_total = list("casos" = lista_serie_casos, "obitos" = lista_serie_obitos)
+    serie_total = list("cases" = lista_serie_casos, "deaths" = lista_serie_obitos)
     #return (lista_serie_casos, lista_serie_obitos)
   }
   else{
@@ -64,8 +65,8 @@ pre_proc_data <- function(data = X, tipo = 'graficos'){
     lista_serie_obitos <- pre_proc_merge(dt_obitos, tipo)
     #serie <- list(serie_sem_covid, serie_covid)
     
-    serie_total = list("casos" = lista_serie_casos, "obitos" = lista_serie_obitos)
-    
+    #serie_total = list("casos" = lista_serie_casos, "obitos" = lista_serie_obitos)
+    serie_total = list("cases" = lista_serie_casos, "deaths" = lista_serie_obitos)
     
     #return (lista_serie_casos, lista_serie_obitos)
     #serie_casos, serie_casos_covid <- pre_proc_merge(dt_casos, tipo)
@@ -83,7 +84,7 @@ pre_proc_merge <- function(data, tipo){
     XU <- merge(x=data, y=ufs, by.x="Unidade da Federação", by.y="Estado") %>% 
       select(sigla=Sigla, datadia, value=total)
     serie_sem_covid <- cast(XU, datadia ~ sigla)
-    serie <- list("sem_covid" = serie_sem_covid)
+    serie <- list("no_covid" = serie_sem_covid)
     #return(serie)
     
   }else{ ##else é subnotif
@@ -97,7 +98,7 @@ pre_proc_merge <- function(data, tipo){
     serie_covid <- cast(XU_covid, ano+semana ~ sigla, mean)
     serie_covid <- serie_covid %>% filter(ano == 2020)
     
-    serie <- list('sem_covid' = serie_sem_covid, 'covid' = serie_covid)
+    serie <- list('no_covid' = serie_sem_covid, 'covid' = serie_covid)
     #return(serie, serie_covid)
   }
   return(serie)
@@ -125,7 +126,7 @@ pre_proc_ms <- function(){
   serie_total_casos <- serie_total_casos[estados]
   serie_total_obitos <- serie_total_obitos[estados]
   
-  serie_ms_total <- list("total_casos" = serie_total_casos, "total_obitos" = serie_total_obitos)
+  serie_ms_total <- list("hm_acc_cases" = serie_total_casos, "hm_acc_obitos" = serie_total_obitos)
   
   return(serie_ms_total)
   

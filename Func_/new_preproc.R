@@ -28,7 +28,7 @@ linreg <- function(data) {
   #Adjusting a linear regression to the whole window
   lm(x~t, data)
 }
-pre_proc_data <- function(data = X, tipo = 'graficos'){
+pre_proc_data <- function(data = X, tipo = 'graph'){
   data_corte <- as.POSIXct('2020-05-03')
   
   X <- X[which(X$Tipo =="Estado" & X$sexo =="Total" & X$escala =="casos"), ]
@@ -42,7 +42,7 @@ pre_proc_data <- function(data = X, tipo = 'graficos'){
   X_casos <- X[which(X$dado =="srag"), ]
   X_obitos <- X[which(X$dado =="obito"), ]
   
-  if(tipo == 'graficos'){
+  if(tipo == 'graph'){
     filtro <- c('datadia', "Unidade da Federação", 'total')
   }
   else{
@@ -53,7 +53,7 @@ pre_proc_data <- function(data = X, tipo = 'graficos'){
   dt_casos <- X_casos[filtro]
   dt_obitos <- X_obitos[filtro]
   
-  if(tipo == 'graficos'){
+  if(tipo == 'graph'){
     lista_serie_casos <- pre_proc_merge(dt_casos, tipo)
     lista_serie_obitos <- pre_proc_merge(dt_obitos, tipo)
     
@@ -81,7 +81,7 @@ pre_proc_merge <- function(data, tipo){
   ufs <- read_csv2("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Aux_arqs/ufs.csv")
   ufs["X1"] <- NULL
   ufs$Sigla <- as.factor(ufs$Sigla)
-  if(tipo == 'graficos'){
+  if(tipo == 'graph'){
     XU <- merge(x=data, y=ufs, by.x="Unidade da Federação", by.y="Estado") %>% 
       select(sigla=Sigla, datadia, value=total)
     serie_sem_covid <- cast(XU, datadia ~ sigla)

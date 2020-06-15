@@ -159,9 +159,14 @@ get_anomaly_srag <- function(serie, estado){
 plot_subnotif <- function(acc_tbl, state){
   p <- ggplot(acc_tbl, aes_string(x = index(acc_tbl), y = state))+
     geom_point()+ geom_line() +theme_minimal() + ggtitle(paste("Accummulated underreport - ", state))+ 
-    xlab("Epidemilogical week") + ylab("Accummulated underreport")
+    xlab("Epidemiological week") + ylab("Accummulated underreport")
   print(p)
 }
+fig <- function(width, heigth){
+     options(repr.plot.width = width, repr.plot.height = heigth)
+}
+
+fig(13,6)
 plot_srag <- function(serie, state){
   
   an_v3 <- get_anomaly_srag(serie, state)

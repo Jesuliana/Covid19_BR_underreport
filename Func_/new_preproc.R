@@ -140,7 +140,7 @@ get_anomaly_srag <- function(serie, estado){
   #Adaptative normalization
   w <-  vector()
   x <- ts.an.outliers.boxplot(serie_plot[[estado]], 104, alpha=3)
-  serie_plott$anom <- x
+  serie_plot$anom <- x
   z <- subset(serie_plot, serie_plot['anom']==TRUE)
   
   #Bindin data to show anomalies(A_N) and change points(CP_V3) together

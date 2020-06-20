@@ -245,19 +245,35 @@ calc_underreport <- function(serie, serie_covid){
   sd_df <- sd_df[rep(seq_len(nrow(sd_df)), each = 8), ]
   
   novelty <- serie_2020[11:nrow(serie_2020), 3:29] - serie_sema_16_19[11:nrow(serie_2020), 3:29] #removing the noise from 2020
-  
+
   novelty <- novelty - mean_df
-  novelty_sd_p <- novelty + sd_df
-  novelty_sd_m <- novelty - sd_df
+
+  wilcoxtest_novelty <- mapply(wilcox.test, novelty, error_baseline, alternative = 'greater') # verifica se houve novidade
+  p_values_novelty <- wilcoxtest_novelty[seq(3, length(wilcoxtest_novelty), 7)]
+  uppers <- sapply(error_baseline, FUN = upper_boundaries)
+  uppers <- data.frame(lapply(uppers, function(x) t(data.frame(x))))
+  uppers <- uppers[rep(seq_len(nrow(uppers)), each = 8), ]
+  lowers <- sapply(error_baseline, FUN = lower_boundaries)
+  lowers <- data.frame(lapply(lowers, function(x) t(data.frame(x))))
+  lowers <- lowers[rep(seq_len(nrow(lowers)), each = 8), ]
+
   
-  ur_inf <- novelty_sd_m - serie_covid[11:nrow(serie_2020), 3:29]#underreport limits and predicted number
+  #boundaries[['MG']]['upper']   #ACCESSING THE DATA
+  novelty <- novelty - mean_df
+  novelty_upper <- novidade + uppers #boundaries
+  novelty_lower <- novidade - lowers #boundaries
+
+  ur_inf <- novelty_lower - serie_covid[11:nrow(serie_2020), 3:29]#underreport limits and predicted number
   ur_middle <- novelty - serie_covid[11:nrow(serie_2020), 3:29] 
-  ur_sup <- novelty_sd_p - serie_covid[11:nrow(serie_2020), 3:29]
-  
-  ur_inf[ur_inf < 0] <- 0
-  ur_middle[ur_middle < 0] <- 0
-  ur_sup[ur_sup < 0] <- 0
-  
+  ur_sup <- novelty_upper - serie_covid[11:nrow(serie_2020), 3:29]
+  wilcoxtest_ur <- mapply(wilcox.test, novelty, serie_covid[11:nrow(serie_2020),3:29], alternative = 'greater') # verifica se houve novidade
+  p_values_ur <- wilcoxtest_ur[seq(3, length(wilcoxtest_ur), 7)]
+  dfdfdf <- data.frame("epsilon_2020" = mean_noise_baseline,
+                     "p_v_nov" = (unlist(p_values_novelty)< 0.05),
+                     "p_v_ur" = (unlist(p_values_ur)< 0.05))
+  dfdfdf$epsilon_2020<-NULL
+  print(dfdfdf)
+
   ur_inf_tbl <- t(tail(cumsum(ur_inf), 1))
   ur_middle_tbl <- t(tail(cumsum(ur_middle), 1))
   ur_sup_tbl <- t(tail(cumsum(ur_sup), 1))
@@ -292,6 +308,27 @@ calc_ur_rate <- function(acc_table, hm_data){
   return(rate_table)
 }
 
-
+lower_boundaries <- function(x, replic=1000) {
+  library(boot)
+  # function to obtain the mean
+  Bmean <- function(data, i) {
+    d <- data[i] # allows boot to select sample
+    return(mean(d))
+  }
+  results <- boot(data=x, statistic=Bmean, R=replic)  
+  result <- boot.ci(results, type=c("bca"))
+  return(lower=(Bmean(x) - result$bca[4]))
+}
+upper_boundaries <- function(x, replic=1000) {
+  library(boot)
+  # function to obtain the mean
+  Bmean <- function(data, i) {
+    d <- data[i] # allows boot to select sample
+    return(mean(d))
+  }
+  results <- boot(data=x, statistic=Bmean, R=replic)  
+  result <- boot.ci(results, type=c("bca"))
+  return(upper = (result$bca[5]- Bmean(x)))
+}
 
 

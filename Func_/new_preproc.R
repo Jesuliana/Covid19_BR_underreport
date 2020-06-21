@@ -9,6 +9,8 @@ library(zoo)
 source("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Func_/ETL_SRAG.R")
 source('https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Func_/evtdet.R')
 
+set.seed(10)
+
 compute_ma <- function(data) {
   data_ema <- data %>% select(ano, semana)
   for (i in 3:ncol(data)) {
@@ -127,7 +129,7 @@ pre_proc_ms <- function(){
   serie_total_casos <- serie_total_casos[estados]
   serie_total_obitos <- serie_total_obitos[estados]
   
-  serie_ms_total <- list("hm_acc_cases" = serie_total_casos, "hm_acc_obitos" = serie_total_obitos)
+  serie_ms_total <- list("hm_acc_cases" = serie_total_casos, "hm_acc_deaths" = serie_total_obitos)
   
   return(serie_ms_total)
   

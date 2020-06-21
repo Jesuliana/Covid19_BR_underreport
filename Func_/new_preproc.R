@@ -222,7 +222,7 @@ calc_erro <- function(serie){#serie tipo subnotif #FECHADO
   #             "Status" = status)
   data <- data.frame("epsilon_2020" = mean_noise_2020,
                      "epsilon_baseline" = mean_noise_baseline,
-                     "desvio_padrao" = sd_noise_baseline)
+                     "desvio_padrao" = sd_noise_baseline) # o trocar para estar dentro do intervalo de confiança
   return(data)
 }
 
@@ -246,10 +246,9 @@ calc_underreport <- function(serie, serie_covid){
   
   novelty <- serie_2020[11:nrow(serie_2020), 3:29] - serie_sema_16_19[11:nrow(serie_2020), 3:29] #removing the noise from 2020
 
-  novelty <- novelty - mean_df
-
   wilcoxtest_novelty <- mapply(wilcox.test, novelty, error_baseline, alternative = 'greater') # verifica se houve novidade
   p_values_novelty <- wilcoxtest_novelty[seq(3, length(wilcoxtest_novelty), 7)]
+
   uppers <- sapply(error_baseline, FUN = upper_boundaries)
   uppers <- data.frame(lapply(uppers, function(x) t(data.frame(x))))
   uppers <- uppers[rep(seq_len(nrow(uppers)), each = 8), ]
@@ -259,20 +258,23 @@ calc_underreport <- function(serie, serie_covid){
 
   
   #boundaries[['MG']]['upper']   #ACCESSING THE DATA
-  novelty <- novelty - mean_df
   novelty_upper <- novelty + uppers #boundaries
   novelty_lower <- novelty - lowers #boundaries
+  novelty <- novelty - mean_df
+
+  wilcoxtest_ur <- mapply(wilcox.test, novelty, serie_covid[11:nrow(serie_2020),3:29], alternative = 'greater', paired = TRUE) # verifica se houve novidade
+  #teste pareado 
+  p_values_ur <- wilcoxtest_ur[seq(3, length(wilcoxtest_ur), 7)]
 
   ur_inf <- novelty_lower - serie_covid[11:nrow(serie_2020), 3:29]#underreport limits and predicted number
   ur_middle <- novelty - serie_covid[11:nrow(serie_2020), 3:29] 
   ur_sup <- novelty_upper - serie_covid[11:nrow(serie_2020), 3:29]
-  wilcoxtest_ur <- mapply(wilcox.test, novelty, serie_covid[11:nrow(serie_2020),3:29], alternative = 'greater') # verifica se houve novidade
-  p_values_ur <- wilcoxtest_ur[seq(3, length(wilcoxtest_ur), 7)]
-  dfdfdf <- data.frame("epsilon_2020" = mean_noise_baseline,
-                     "p_v_nov" = (unlist(p_values_novelty)< 0.05),
-                     "p_v_ur" = (unlist(p_values_ur)< 0.05))
-  dfdfdf$epsilon_2020<-NULL
-  print(dfdfdf)
+                              
+  df_p_values <- data.frame("epsilon_2020" = mean_noise_baseline,
+                     "p_v_nov" = (unlist(p_values_novelty) < 0.05),
+                     "p_v_ur" = (unlist(p_values_ur) < 0.05))
+  df_p_values$epsilon_2020 <- NULL
+  print(df_p_values)
 
   ur_inf_tbl <- t(tail(cumsum(ur_inf), 1))
   ur_middle_tbl <- t(tail(cumsum(ur_middle), 1))
@@ -317,7 +319,8 @@ lower_boundaries <- function(x, replic=1000) {
   }
   results <- boot(data=x, statistic=Bmean, R=replic)  
   result <- boot.ci(results, type=c("bca"))
-  return(lower=(Bmean(x) - result$bca[4]))
+  return(lower=result$bca[4])
+  #return(lower=(Bmean(x) - result$bca[4]))
 }
 upper_boundaries <- function(x, replic=1000) {
   library(boot)
@@ -328,7 +331,8 @@ upper_boundaries <- function(x, replic=1000) {
   }
   results <- boot(data=x, statistic=Bmean, R=replic)  
   result <- boot.ci(results, type=c("bca"))
-  return(upper = (result$bca[5]- Bmean(x)))
+  return(upper = (result$bca[5]))
+  #return(upper = (result$bca[5]- Bmean(x)))
 }
 
 

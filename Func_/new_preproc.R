@@ -260,8 +260,8 @@ calc_underreport <- function(serie, serie_covid){
   
   #boundaries[['MG']]['upper']   #ACCESSING THE DATA
   novelty <- novelty - mean_df
-  novelty_upper <- novidade + uppers #boundaries
-  novelty_lower <- novidade - lowers #boundaries
+  novelty_upper <- novelty + uppers #boundaries
+  novelty_lower <- novelty - lowers #boundaries
 
   ur_inf <- novelty_lower - serie_covid[11:nrow(serie_2020), 3:29]#underreport limits and predicted number
   ur_middle <- novelty - serie_covid[11:nrow(serie_2020), 3:29] 

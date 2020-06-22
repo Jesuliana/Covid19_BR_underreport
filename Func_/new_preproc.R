@@ -1,5 +1,3 @@
-options(warn=-1)
-
 library(readxl)
 library(dplyr)
 library(reshape)
@@ -60,22 +58,13 @@ pre_proc_data <- function(data = X, tipo = 'graph'){
     lista_serie_casos <- pre_proc_merge(dt_casos, tipo)
     lista_serie_obitos <- pre_proc_merge(dt_obitos, tipo)
     
-    #serie_total = list("casos" = lista_serie_casos, "obitos" = lista_serie_obitos)
     serie_total = list("cases" = lista_serie_casos, "deaths" = lista_serie_obitos)
-    #return (lista_serie_casos, lista_serie_obitos)
   }
   else{
     lista_serie_casos <- pre_proc_merge(dt_casos, tipo)
     lista_serie_obitos <- pre_proc_merge(dt_obitos, tipo)
-    #serie <- list(serie_sem_covid, serie_covid)
     
-    #serie_total = list("casos" = lista_serie_casos, "obitos" = lista_serie_obitos)
     serie_total = list("cases" = lista_serie_casos, "deaths" = lista_serie_obitos)
-    
-    #return (lista_serie_casos, lista_serie_obitos)
-    #serie_casos, serie_casos_covid <- pre_proc_merge(dt_casos, tipo)
-    #serie_obitos, serie_obitos_covid <- pre_proc_merge(dt_obitos, tipo)
-    #return (serie_casos, serie_casos_covid, serie_obitos, serie_obitos_covid)
   }
   return (serie_total)
 }
@@ -89,21 +78,19 @@ pre_proc_merge <- function(data, tipo){
       select(sigla=Sigla, datadia, value=total)
     serie_sem_covid <- cast(XU, datadia ~ sigla)
     serie <- list("no_covid" = serie_sem_covid)
-    #return(serie)
-    
-  }else{ ##else é subnotif
+  }
+  else{ ##else é subnotif
     XU <- merge(x=data, y=ufs, by.x="Unidade da Federação", by.y="Estado") %>%
       select(sigla=Sigla, ano, semana, value=total)
     serie_sem_covid <- cast(XU, ano+semana ~ sigla, mean)
     
-    
+ 
     XU_covid <- merge(x=data, y=ufs, by.x="Unidade da Federação", by.y="Estado") %>%
       select(sigla=Sigla, ano, semana, value='SARS-CoV-2')
     serie_covid <- cast(XU_covid, ano+semana ~ sigla, mean)
     serie_covid <- serie_covid %>% filter(ano == 2020)
     
     serie <- list('no_covid' = serie_sem_covid, 'covid' = serie_covid)
-    #return(serie, serie_covid)
   }
   return(serie)
 }
@@ -133,7 +120,6 @@ pre_proc_ms <- function(){
   serie_ms_total <- list("hm_acc_cases" = serie_total_casos, "hm_acc_deaths" = serie_total_obitos)
   
   return(serie_ms_total)
-  
 }
 get_anomaly_srag <- function(serie, estado){
   filtro <- c('datadia', estado)
@@ -199,50 +185,38 @@ plot_srag <- function(serie, state){
   print(p)
 }
 calc_error <- function(serie){#serie tipo subnotif #FECHADO
+  print("------- GENERATING THE ERRORS OF THE MODEL TABLE -------")
+
   serie_ma_16_19 <- compute_ma(serie) %>% filter(ano == 2019)
   serie_2020 <- serie %>% filter(ano == 2020)
-  error_2020 <- serie_2020[1:8, 3:29] - serie_ma_16_19[1:8, 3:29]
-  #sd_noise_2020 <- apply(erro, 2, sd)
-  #mean_noise_2020 <- apply(erro_2020, 2, mean)
+  #error_2020 <- serie_2020[1:8, 3:29] - serie_ma_16_19[1:8, 3:29]
   
   serie_ma_15_18 <- compute_ma(serie) %>% filter((ano >= 2015 & ano <= 2018))
   serie_16_19 <- serie %>% filter((ano >= 2016 & ano <= 2019))
   error_baseline <- serie_16_19[, 3:29] - serie_ma_15_18[, 3:29]
-  #sd_noise_baseline <- apply(erro_baseline, 2, sd)
   mean_noise_baseline <- apply(error_baseline, 2, mean)
   
   up <- sapply(error_baseline, FUN = upper_boundaries)
   low <- sapply(error_baseline, FUN = lower_boundaries)
   
   interval <- paste('[' , paste(round(low, 3), round(up, 3), sep = ', '), ']' ,sep = "") 
-  #erro_geral <- abs(mean_noise_2020 - mean_noise_baseline)
-  #erro_geral_inf <- erro_geral - sd_noise_baseline
-  #erro_geral_sup <- erro_geral + sd_noise_baseline
-  #status <- erro_geral <= sd_noise_baseline
-  #data <- data.frame("Erro_inf" = erro_geral_inf,
-  #                 "Erro" = erro_geral,
-  #               "Erro_sup" = erro_geral_sup,
-  #             "Status" = status)
-  #data <- data.frame("epsilon_2020" = mean_noise_2020,
-                     #"epsilon_baseline" = mean_noise_baseline,
-                     #"desvio_padrao" = sd_noise_baseline) # o trocar para estar dentro do intervalo de confiança
   
   data <- data.frame("epsilon_baseline" = round(mean_noise_baseline, 3), 
-                     "interval" = interval)
+                     "interval" = interval) #tabela de intervalos de erros
   return(data)
 }
 
 
 calc_underreport <- function(serie, serie_covid){
+  print("------- GENERATING THE CUMULATIVE UNDERREPORTED TABLE -------")
+  
   serie_sema_16_19 <- compute_ma(serie) %>% filter(ano == 2019) #SEMA to test the expected error in 2020 first 8 weeks 
   serie_2020 <- serie %>% filter(ano == 2020) 
-  error_2020 <- serie_2020[1:8, 3:29] - serie_sema_16_19[1:8, 3:29] #removing the expected error of the first weeks 
-  #mean_noise_2020 <- apply(error_2020, 2, mean)
+  #error_2020 <- serie_2020[1:8, 3:29] - serie_sema_16_19[1:8, 3:29] #removing the expected error of the first weeks 
   
   serie_sema_15_18 <- compute_ma(serie) %>% filter((ano >= 2015 & ano <= 2018)) #SEMA to calculate the noise of the method
   serie_16_19 <- serie %>% filter((ano >= 2016 & ano <= 2019)) 
   error_baseline <- serie_16_19[, 3:29] - serie_sema_15_18[, 3:29] #testing the noise
-  sd_noise_baseline <- apply(error_baseline, 2, sd) #standard deviation of the noise of the method
   mean_noise_baseline <- apply(error_baseline, 2, mean) #mean of the noise of the method
   
   mean_df <- data.frame(lapply(mean_noise_baseline, function(x) t(data.frame(x))))
@@ -259,27 +233,29 @@ calc_underreport <- function(serie, serie_covid){
   lowers <- sapply(error_baseline, FUN = lower_boundaries)
   lowers <- data.frame(lapply(lowers, function(x) t(data.frame(x))))
   lowers <- lowers[rep(seq_len(nrow(lowers)), each = 8), ]
-
-  novelty_upper <- novelty - lowers #boundaries
+    #TIRO O ERRO POR SEMANA
+  novelty_upper <- novelty - lowers #boundaries 
   novelty_lower <- novelty - uppers #boundaries
   novelty <- novelty - mean_df
 
-  wilcoxtest_ur <- mapply(wilcox.test, novelty, serie_covid[11:nrow(serie_2020),3:29], alternative = 'greater', paired = TRUE) # verifica se houve novidade
-  #teste pareado 
+  wilcoxtest_ur <- mapply(wilcox.test, novelty, serie_covid[11:nrow(serie_2020),3:29],
+                          alternative = 'greater', paired = TRUE) # verifica se houve novidade, teste pareado 
   p_values_ur <- wilcoxtest_ur[seq(3, length(wilcoxtest_ur), 7)]
-
+    #TIRO A QUANTIDADE DE COVID POR SEMANA PARA CADA
   ur_inf <- novelty_lower - serie_covid[11:nrow(serie_2020), 3:29]#underreport limits and predicted number
   ur_middle <- novelty - serie_covid[11:nrow(serie_2020), 3:29] 
   ur_sup <- novelty_upper - serie_covid[11:nrow(serie_2020), 3:29]
+    #E DEPOIS NORMALIZO PARA 0 TODAS AS SEMANAS QUE TIVERAM QUANTIDADE < 0
+        # ASSUMINDO QUE NÃO HOUVE SUBNOTIF NA SEMANA
   ur_inf[ur_inf < 0] <- 0
   ur_middle[ur_middle < 0] <- 0
   ur_sup[ur_sup < 0] <- 0
-
                               
   df_p_values <- data.frame("epsilon_2020" = mean_noise_baseline,
                      "p_v_nov" = (unlist(p_values_novelty) < 0.05),
-                     "p_v_ur" = (unlist(p_values_ur) < 0.05))
+                     "p_v_ur" = (unlist(p_values_ur) < 0.05)) #teste de p_values
   df_p_values$epsilon_2020 <- NULL
+  print("------- P-VALUES TEST TABLE -------")
   print(df_p_values)
 
   ur_inf_tbl <- t(tail(cumsum(ur_inf), 1))

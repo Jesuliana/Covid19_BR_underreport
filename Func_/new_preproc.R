@@ -263,10 +263,10 @@ calc_underreport <- function(serie, serie_covid){
   ur_middle_tbl <- t(tail(cumsum(ur_middle), 1))
   ur_sup_tbl <- t(tail(cumsum(ur_sup), 1))
   
-  acc_table <- data.frame('inferior' = ur_inf_tbl,
-                          'middle' = ur_middle_tbl,
-                          'superior' = ur_sup_tbl,
-                          'covid_cum' = cum_covid) #create the accumulated table
+  acc_table <- data.frame('inferior' = round(ur_inf_tbl, 0),
+                          'middle' = round(ur_middle_tbl, 0),
+                          'superior' = round(ur_sup_tbl, 0),
+                          'covid_cum' = round(cum_covid, 0)) #create the accumulated table
   
   colnames(acc_table)[1] <- "inferior"
   colnames(acc_table)[2] <- "predicted"

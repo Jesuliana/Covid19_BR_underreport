@@ -29,8 +29,10 @@ linreg <- function(data) {
   #Adjusting a linear regression to the whole window
   lm(x~t, data)
 }
-pre_proc_data <- function(data = X, tipo = 'graph'){
-  data_corte <- as.POSIXct('2020-05-03')
+pre_proc_data <- function(data = X, tipo = 'graph', datelim = '2020-05-02'){
+  datelim <- as.POSIXct(datelim)
+  a_day <- 60*60*24
+  data_corte <- trunc(datelim,"days")+ a_day
   
   X <- X[which(X$Tipo =="Estado" & X$sexo =="Total" & X$escala =="casos"), ]
   colnames(X)[8] <- "ano"
@@ -117,7 +119,7 @@ pre_proc_ms <- function(){
   serie_total_casos <- serie_total_casos[estados]
   serie_total_obitos <- serie_total_obitos[estados]
   
-  serie_ms_total <- list("hm_acc_cases" = serie_total_casos, "hm_acc_deaths" = serie_total_obitos)
+  serie_ms_total <- list("hm_acc_cases" = t(serie_total_casos), "hm_acc_deaths" = t(serie_total_obitos))
   
   return(serie_ms_total)
 }
@@ -163,7 +165,7 @@ plot_srag <- function(serie, state){
   filtro <- c('datadia', state)
   max_casos <- max(serie[[state]])
   lims <- as.POSIXct(strptime(c("2009-02-01","2020-06-01"), format = "%Y-%m-%d")) 
-  
+RJ  
   if ( max_casos < 50){
     p <- evtplot(serie[filtro], an_v3, mark.cp=TRUE, ylim = c(0, 50)) +
       scale_x_datetime(date_breaks = "6 months",
@@ -246,11 +248,6 @@ calc_underreport <- function(serie, serie_covid){
   ur_inf <- novelty_lower # - serie_covid[11:nrow(serie_2020), 3:29]#underreport limits and predicted number
   ur_middle <- novelty # - serie_covid[11:nrow(serie_2020), 3:29] 
   ur_sup <- novelty_upper # - serie_covid[11:nrow(serie_2020), 3:29]
-    #E DEPOIS NORMALIZO PARA 0 TODAS AS SEMANAS QUE TIVERAM QUANTIDADE < 0
-        # ASSUMINDO QUE NÃO HOUVE SUBNOTIF NA SEMANA
-  #ur_inf[ur_inf < 0] <- 0
-  #ur_middle[ur_middle < 0] <- 0
-  #ur_sup[ur_sup < 0] <- 0
                               
   df_p_values <- data.frame("epsilon_2020" = mean_noise_baseline,
                      "p_v_nov" = (unlist(p_values_novelty) < 0.05),

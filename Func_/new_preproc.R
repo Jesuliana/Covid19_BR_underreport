@@ -164,7 +164,7 @@ plot_srag <- function(serie, state){
   filtro <- c('datadia', state)
   max_casos <- max(serie[[state]])
   lims <- as.POSIXct(strptime(c("2009-02-01","2020-06-01"), format = "%Y-%m-%d")) 
-RJ  
+  
   if ( max_casos < 50){
     p <- evtplot(serie[filtro], an_v3, mark.cp=TRUE, ylim = c(0, 50)) +
       scale_x_datetime(date_breaks = "6 months",

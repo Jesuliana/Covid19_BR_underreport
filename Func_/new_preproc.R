@@ -95,9 +95,9 @@ pre_proc_merge <- function(data, tipo){
     serie <- list('no_covid' = serie_sem_covid, 'covid' = serie_covid)
   }
   return(serie)
-}
-pre_proc_ms <- function(){
-  infogripe_data = '2020-05-02'
+} 
+pre_proc_ms <- function(datelim = '2020-05-02'){
+  infogripe_data = datelim
   #serie_ms <- read_excel('~/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.xlsx') #dado do ms
   serie_ms <- read_csv2("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.csv")
   serie_ms["X1"] <- NULL
@@ -120,7 +120,6 @@ pre_proc_ms <- function(){
   serie_total_obitos <- serie_total_obitos[estados]
   
   serie_ms_total <- list("hm_acc_cases" = t(serie_total_casos), "hm_acc_deaths" = t(serie_total_obitos))
-  
   return(serie_ms_total)
 }
 get_anomaly_srag <- function(serie, estado){

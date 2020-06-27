@@ -280,7 +280,7 @@ calc_underreport <- function(serie, serie_covid, hmdata){
 
   UR_table <- table_to_show
   UR_table$rate <- txs$rate
-  UR_table$Cum._Covid_HM <- hm_data
+  UR_table$Cum._Covid_HM <- hmdata
 
   colnames(UR_table)[1] <- "Cum._Novelty_SARI"
   colnames(UR_table)[2] <- "Cum._Covid_SARI"

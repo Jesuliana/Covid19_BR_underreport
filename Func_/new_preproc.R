@@ -285,6 +285,16 @@ calc_underreport <- function(serie, serie_covid, hmdata){
   colnames(UR_table)[1] <- "Cum._Novelty_SARI"
   colnames(UR_table)[2] <- "Cum._Covid_SARI"
   colnames(UR_table)[3] <- "Rate"
+                              
+  for (i in seq(1:27)){
+    if (df_p_values$random_noise_test[i] == FALSE){
+      UR_table$Rate[i] <- "*"
+    }else{
+      if(df_p_values$reported_values_test[i] == FALSE){
+       UR_table$Rate[i] <- "**"
+    }
+  }
+}
 
   return(UR_table)
 }
@@ -338,5 +348,3 @@ upper_boundaries <- function(x, replic=1000) {
   result <- boot.ci(results, type=c("bca"))
   return(upper = (result$bca[5]))
 }
-
-

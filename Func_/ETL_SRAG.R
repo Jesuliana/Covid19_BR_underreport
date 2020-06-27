@@ -1,6 +1,7 @@
 # ETL SRAG
 library(readr)
-srag <- read_csv2(file = "https://gitlab.procc.fiocruz.br/mave/repo/raw/master/Dados/InfoGripe/dados_semanais_faixa_etaria_sexo_virus.csv", col_types = cols(
+srag <- read_delim(file = "https://gitlab.procc.fiocruz.br/mave/repo/raw/master/Dados/InfoGripe/dados_semanais_faixa_etaria_sexo_virus.csv", delim = ';',
+  col_types = cols(
   .default = col_double(),
   `data de publicação` = col_date(format = ""),
   UF = col_character(),

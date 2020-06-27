@@ -72,7 +72,7 @@ pre_proc_data <- function(data = X, tipo = 'graph', datelim = '2020-05-02'){
 }
 pre_proc_merge <- function(data, tipo){
   #ufs <- read_excel("~/Aux_arqs/ufs.xls")
-  ufs <- read_csv("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Aux_arqs/ufs.csv", col_types = cols())
+  ufs <- read_csv("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Aux_arqs/ufs.csv", delim = ';', col_types = cols())
   ufs["X1"] <- NULL
   ufs$Sigla <- as.factor(ufs$Sigla)
   if(tipo == 'graph'){

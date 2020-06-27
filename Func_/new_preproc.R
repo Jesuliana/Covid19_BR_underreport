@@ -85,7 +85,6 @@ pre_proc_merge <- function(data, tipo){
     XU <- merge(x=data, y=ufs, by.x="Unidade da Federação", by.y="Estado") %>%
       select(sigla=Sigla, ano, semana, value=total)
     serie_sem_covid <- cast(XU, ano+semana ~ sigla, mean)
-    
  
     XU_covid <- merge(x=data, y=ufs, by.x="Unidade da Federação", by.y="Estado") %>%
       select(sigla=Sigla, ano, semana, value='SARS-CoV-2')
@@ -97,18 +96,6 @@ pre_proc_merge <- function(data, tipo){
   return(serie)
 }
 pre_proc_ms <- function(datelim = '2020-05-02'){
-  infogripe_data = datelim
-  #serie_ms <- read_excel('~/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.xlsx') #dado do ms
-  serie_ms <- read_delim("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.csv", delim = ';',col_types = cols())
-  serie_ms["X1"] <- NULL
-  serie_ms$casosAcumulado <- as.numeric(serie_ms$casosAcumulado)
-  serie_ms$obitosAcumulado <- as.numeric(serie_ms$obitosAcumulado)
-  
-  serie <- serie_ms[which(serie_ms$regiao != 'Brasil' & serie_ms$data == infogripe_data), ]
-  
-  serie_total_casos <- serie[c('estado', 'casosAcumulado')]
-  serie_total_obitos <- serie[c('estado', 'obitosAcumulado')]
-  pre_proc_ms <- function(datelim = '2020-05-02'){
   infogripe_data = datelim
   #serie_ms <- read_excel('~/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.xlsx') #dado do ms
   serie_ms <- read_delim("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.csv", delim = ';',col_types = cols())
@@ -132,19 +119,6 @@ pre_proc_ms <- function(datelim = '2020-05-02'){
   #serie_total_obitos <- serie_total_obitos[estados]
   
   serie_ms_total <- list("hm_acc_cases" = serie_total_casos, "hm_acc_deaths" = serie_total_obitos)
-  return(serie_ms_total)
-}
-  serie_total_casos <- aggregate(serie_total_casos$casosAcumulado, 
-                                 by=list(Category=serie_total_casos$estado), FUN=max)
-  serie_total_obitos <- aggregate(serie_total_obitos$obitosAcumulado , 
-                                  by=list(Category=serie_total_obitos$estado), FUN=max)
-  serie_total_casos <- cast(serie_total_casos, ~Category)
-  serie_total_obitos <- cast(serie_total_obitos, ~Category)
-  estados <- names(serie_total_casos[2:28])
-  serie_total_casos <- serie_total_casos[estados]
-  serie_total_obitos <- serie_total_obitos[estados]
-  
-  serie_ms_total <- list("hm_acc_cases" = t(serie_total_casos), "hm_acc_deaths" = t(serie_total_obitos))
   return(serie_ms_total)
 }
 get_anomaly_srag <- function(serie, estado){

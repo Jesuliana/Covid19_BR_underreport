@@ -95,7 +95,7 @@ pre_proc_merge <- function(data, tipo){
     serie <- list('no_covid' = serie_sem_covid, 'covid' = serie_covid)
   }
   return(serie)
-} 
+}
 pre_proc_ms <- function(datelim = '2020-05-02'){
   infogripe_data = datelim
   #serie_ms <- read_excel('~/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.xlsx') #dado do ms
@@ -108,7 +108,32 @@ pre_proc_ms <- function(datelim = '2020-05-02'){
   
   serie_total_casos <- serie[c('estado', 'casosAcumulado')]
   serie_total_obitos <- serie[c('estado', 'obitosAcumulado')]
+  pre_proc_ms <- function(datelim = '2020-05-02'){
+  infogripe_data = datelim
+  #serie_ms <- read_excel('~/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.xlsx') #dado do ms
+  serie_ms <- read_delim("https://raw.githubusercontent.com/balthapaixao/Covid19_BR_underreport/master/Aux_arqs/HIST_PAINEL_COVIDBR_31mai2020.csv", delim = ';',col_types = cols())
+  serie_ms["X1"] <- NULL
+  serie_ms$casosAcumulado <- as.numeric(serie_ms$casosAcumulado)
+  serie_ms$obitosAcumulado <- as.numeric(serie_ms$obitosAcumulado)
   
+  serie <- serie_ms[which(serie_ms$regiao != 'Brasil' & serie_ms$data == infogripe_data), ]
+  
+  serie_total_casos <- serie[c('estado', 'casosAcumulado')]
+  serie_total_obitos <- serie[c('estado', 'obitosAcumulado')]
+  
+  serie_total_casos <- aggregate(serie_total_casos$casosAcumulado, 
+                                 by=list(Category=serie_total_casos$estado), FUN=max)
+  serie_total_obitos <- aggregate(serie_total_obitos$obitosAcumulado , 
+                                  by=list(Category=serie_total_obitos$estado), FUN=max)
+  #serie_total_casos <- cast(serie_total_casos, ~Category)
+  #serie_total_obitos <- cast(serie_total_obitos, ~Category)
+  #estados <- names(serie_total_casos[2:28])
+  #serie_total_casos <- serie_total_casos[estados]
+  #serie_total_obitos <- serie_total_obitos[estados]
+  
+  serie_ms_total <- list("hm_acc_cases" = serie_total_casos, "hm_acc_deaths" = serie_total_obitos)
+  return(serie_ms_total)
+}
   serie_total_casos <- aggregate(serie_total_casos$casosAcumulado, 
                                  by=list(Category=serie_total_casos$estado), FUN=max)
   serie_total_obitos <- aggregate(serie_total_obitos$obitosAcumulado , 
@@ -279,7 +304,7 @@ calc_underreport <- function(serie, serie_covid, hmdata){
 
   UR_table <- table_to_show
   UR_table$rate <- txs$rate
-  UR_table$Cum._Covid_HM <- hmdata
+  UR_table$Cum._Covid_HM <- hmdata$x
 
   colnames(UR_table)[1] <- "Cum._Novelty_SARI"
   colnames(UR_table)[2] <- "Cum._Covid_SARI"

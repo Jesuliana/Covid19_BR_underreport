@@ -209,7 +209,7 @@ calc_error <- function(serie){#serie tipo subnotif #FECHADO
 }
 
 
-calc_underreport <- function(serie, serie_covid){
+calc_underreport <- function(serie, serie_covid, hmdata){
   print("------- GENERATING THE CUMULATIVE UNDERREPORTED TABLE -------")
 
   serie_sema_16_19 <- compute_ma(serie) %>% filter(ano == 2019) #SEMA to test the expected error in 2020 first 8 weeks 

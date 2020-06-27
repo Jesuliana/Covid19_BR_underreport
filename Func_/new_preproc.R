@@ -112,11 +112,6 @@ pre_proc_ms <- function(datelim = '2020-05-02'){
                                  by=list(Category=serie_total_casos$estado), FUN=max)
   serie_total_obitos <- aggregate(serie_total_obitos$obitosAcumulado , 
                                   by=list(Category=serie_total_obitos$estado), FUN=max)
-  #serie_total_casos <- cast(serie_total_casos, ~Category)
-  #serie_total_obitos <- cast(serie_total_obitos, ~Category)
-  #estados <- names(serie_total_casos[2:28])
-  #serie_total_casos <- serie_total_casos[estados]
-  #serie_total_obitos <- serie_total_obitos[estados]
   
   serie_ms_total <- list("hm_acc_cases" = serie_total_casos, "hm_acc_deaths" = serie_total_obitos)
   return(serie_ms_total)
